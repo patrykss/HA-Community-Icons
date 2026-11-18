@@ -1,0 +1,32 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Validate JSON metadata
+        run: |
+          python -m json.tool hacs.json >/dev/null
+          python -m json.tool custom_components/haci/manifest.json >/dev/null
+      - name: Validate SVG files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          for path in Path("custom_components/haci/www/icons").glob("*.svg"):
+              root = ET.parse(path).getroot()
+              assert root.tag.endswith("svg"), path
+              assert root.attrib.get("viewBox"), path
+              assert root.findall(".//{http://www.w3.org/2000/svg}path"), path
+              assert path.stem.replace("-", "").isalnum(), path
+              print(f"OK: {path}")
+          PY

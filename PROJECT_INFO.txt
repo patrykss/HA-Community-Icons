@@ -1,0 +1,5 @@
+HA Community Icons
+Repository: https://github.com/patrykss/ha-community-icons
+Author: patrykss
+Icon prefix: haci:
+Example icon: haci:car-trailer
